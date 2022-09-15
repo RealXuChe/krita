@@ -13,6 +13,8 @@ private Q_SLOTS:
     void testBrushSpacing();
 
     void testPrecision();
+
+    void benchmark();
 };
 
 #endif //KRITA_KIS_BUGGY_TEST_H
