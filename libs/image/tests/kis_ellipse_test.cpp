@@ -365,6 +365,122 @@ void KisEllipseTest::testPrecision() {
 
 }
 
+
+void KisEllipseTest::benchmark() {
+
+    QRect imageRect = QRect(0, 0, 10000, 10000);
+
+    const KoColorSpace *cs = KoColorSpaceRegistry::instance()->rgb8();
+    KisImageSP image = new KisImage(nullptr, imageRect.width(), imageRect.height(), cs, "benchmark");
+
+    KisPaintLayerSP paintLayer1 = new KisPaintLayer(image, "bench", OPACITY_OPAQUE_U8);
+    image->addNode(paintLayer1);
+
+    image->initialRefreshGraph();
+    image->resizeImage(QRect(0, 0, 10000, 10000));
+    image->waitForDone();
+
+    KisNodeSP paint1 = TestUtil::findNode(image->root(), "bench");
+
+    QVERIFY(paint1->extent().isEmpty());
+
+    paint1->paintDevice()->fill(QRect(0, 0, 10000, 10000), KoColor(Qt::red, cs));
+
+    KisPainter gc(paint1->paintDevice());
+    QScopedPointer<KoCanvasResourceProvider> shapeBrushManager(
+            utils::createResourceManager(image, 0, "Pixel_Art_Copy.kpp"));;
+
+    {
+        gc.setPaintColor(KoColor(Qt::black, cs));
+        gc.setBackgroundColor(KoColor(Qt::blue, cs));
+        gc.setGenerator(shapeBrushManager->resource(KoCanvasResource::CurrentGeneratorConfiguration).value<KisFilterConfiguration *>());
+        gc.setPattern(shapeBrushManager->resource(KoCanvasResource::CurrentPattern).value<KoPatternSP>());
+
+        gc.setOpacity(OPACITY_OPAQUE_U8);
+        gc.setCompositeOpId(shapeBrushManager->resource(KoCanvasResource::CurrentEffectiveCompositeOp).toString());
+        gc.setMirrorInformation(KisAlgebra2D::relativeToAbsolute(image->mirrorAxesCenter(),
+                                                                 (new KisDefaultBounds(image))->imageBorderRect()),
+                                false,
+                                false);
+
+        gc.setStrokeStyle(KisPainter::StrokeStyleBrush);
+        gc.setFillStyle(KisPainter::FillStyleNone);
+
+        gc.setPaintOpPreset(shapeBrushManager->resource(KoCanvasResource::CurrentPaintOpPreset).value<KisPaintOpPresetSP>(),
+                            paint1,
+                            image);
+    }
+
+    auto start_time =std::chrono::high_resolution_clock::now();
+
+    gc.paintEllipse(50.0, 14000.0, M_PI_4, {5000.000000, 5000.000000});
+    gc.paintEllipse(50.0, 13000.0, M_PI_4+0.017453292519943295*00001.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(50.0, 13000.0, M_PI_4-0.017453292519943295*00001.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(50.0, 14000.0, 3*M_PI_4, {5000.000000, 5000.000000});
+    gc.paintEllipse(50.0, 13000.0, 3*M_PI_4+0.017453292519943295*00001.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(50.0, 13000.0, 3*M_PI_4-0.017453292519943295*00001.0, {5000.000000, 5000.000000});
+
+    gc.setPaintColor(KoColor(Qt::darkYellow, cs));
+
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00000.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00001.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00002.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00003.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00004.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00005.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00006.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00007.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00008.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00009.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00010.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00011.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00012.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00013.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00014.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00015.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00016.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00017.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00018.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00019.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00020.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00021.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00022.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00023.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00024.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00025.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00026.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00027.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00028.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00029.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00030.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00031.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00032.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00033.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00034.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00035.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00036.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00037.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00038.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00039.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00040.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00041.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00042.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00043.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00044.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00045.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00046.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00047.0, {5000.000000, 5000.000000});
+    gc.paintEllipse(9974.0, 9988.0, 0.017453292519943295*00048.0, {5000.000000, 5000.000000});
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    std::cout<<"Time consumed(ms): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time-start_time).count()<<std::endl;
+
+    // some output here to avoid compiler optimize
+    QImage I = gc.device().data()->convertToQImage(nullptr);
+    std::cout << "Ignore This line. " << I.size().height() << std::endl;
+}
+
 KISTEST_MAIN(KisEllipseTest)
 
 
