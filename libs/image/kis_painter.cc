@@ -1515,7 +1515,10 @@ void KisPainter::paintEllipse(qreal a_, qreal b_, qreal angle, QPointF offset) {
         points.push_back(QPointF(dfghjk.first + offset.x(),dfghjk.second+offset.y()));
     }
 
+    auto start_time =std::chrono::high_resolution_clock::now();
     paintPolygon(points);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::cout<<"Time painting(ms): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time-start_time).count()<<std::endl;
 
 }
 
